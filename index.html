@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Date Calculator</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        background: #f5f4f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "DM Sans", "Helvetica Neue", sans-serif;
+        padding: 32px 16px;
+        color: #1a1a1a;
+      }
+
+      .wrapper {
+        width: 100%;
+        max-width: 680px;
+      }
+
+      .header {
+        margin-bottom: 24px;
+      }
+      .header-eyebrow {
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        color: #aaa;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .header-title {
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #e8e6e1;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        margin-bottom: 12px;
+      }
+
+      .section {
+        padding: 24px;
+      }
+      .section + .section {
+        border-top: 1px solid #f0eee9;
+      }
+
+      .section-label {
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        color: #aaa;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+      }
+
+      /* Input groups */
+      .row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .row:last-child {
+        margin-bottom: 0;
+      }
+      .group {
+        flex: 1;
+      }
+      .group label {
+        display: block;
+        font-size: 11px;
+        color: #999;
+        margin-bottom: 6px;
+      }
+      .group input {
+        width: 100%;
+        padding: 10px 14px;
+        background: #f9f8f6;
+        border: 1.5px solid #e8e6e1;
+        border-radius: 10px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        color: #1a1a1a;
+        transition: border-color 0.15s;
+      }
+      .group input:focus {
+        outline: none;
+        border-color: #1a1a1a;
+      }
+      .group input[type="number"] {
+        font-family: "DM Mono", monospace;
+        font-size: 20px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+      }
+      input[type="date"]::-webkit-calendar-picker-indicator {
+        opacity: 0.35;
+        cursor: pointer;
+      }
+
+      /* Quick buttons */
+      .quick-label {
+        font-size: 11px;
+        color: #999;
+        margin-bottom: 8px;
+        display: block;
+      }
+      .quick-btns {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .quick-btn {
+        padding: 6px 14px;
+        border-radius: 8px;
+        border: 1.5px solid #e8e6e1;
+        background: #f9f8f6;
+        font-family: "DM Sans", sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        color: #555;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .quick-btn:hover {
+        background: #1a1a1a;
+        color: #fff;
+        border-color: #1a1a1a;
+      }
+      .quick-btn.active {
+        background: #1a1a1a;
+        color: #fff;
+        border-color: #1a1a1a;
+      }
+
+      /* Direction toggle */
+      .dir-wrap {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 0;
+      }
+      .dir-btn {
+        flex: 1;
+        padding: 9px;
+        border-radius: 8px;
+        border: 1.5px solid transparent;
+        background: #f2f1ee;
+        font-family: "DM Sans", sans-serif;
+        font-size: 13px;
+        font-weight: 400;
+        color: #666;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .dir-btn.active {
+        background: #1a1a1a;
+        color: #fff;
+        font-weight: 600;
+      }
+      .dir-btn:hover:not(.active) {
+        background: #e8e6e1;
+      }
+
+      /* Result */
+      .result-big {
+        font-family: "DM Mono", monospace;
+        font-size: 15px;
+        font-weight: 500;
+        color: #1a1a1a;
+        letter-spacing: 0.01em;
+        margin-bottom: 6px;
+      }
+      .result-day {
+        font-size: 13px;
+        color: #888;
+        margin-bottom: 16px;
+      }
+
+      .result-date-display {
+        font-family: "DM Mono", monospace;
+        font-size: 42px;
+        font-weight: 500;
+        color: #1a1a1a;
+        letter-spacing: -0.02em;
+        line-height: 1;
+        margin-bottom: 8px;
+      }
+
+      .result-full {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 20px;
+      }
+
+      /* Breakdown chips */
+      .breakdown {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .chip {
+        padding: 6px 12px;
+        border-radius: 8px;
+        background: #f5f4f0;
+        border: 1px solid #e8e6e1;
+        font-size: 12px;
+        color: #555;
+      }
+      .chip strong {
+        font-family: "DM Mono", monospace;
+        font-size: 13px;
+        font-weight: 500;
+        color: #1a1a1a;
+        margin-right: 3px;
+      }
+
+      /* Diff section */
+      .diff-result {
+        font-family: "DM Mono", monospace;
+        font-size: 42px;
+        font-weight: 500;
+        color: #1a1a1a;
+        letter-spacing: -0.02em;
+        line-height: 1;
+        margin-bottom: 8px;
+      }
+      .diff-result span {
+        font-family: "DM Sans", sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        color: #888;
+        margin-left: 6px;
+      }
+      .diff-breakdown {
+        font-size: 13px;
+        color: #888;
+        margin-bottom: 20px;
+      }
+
+      /* Tab switcher */
+      .tabs {
+        display: flex;
+        gap: 0;
+        background: #f2f1ee;
+        border-radius: 10px;
+        padding: 3px;
+        margin-bottom: 20px;
+      }
+      .tab {
+        flex: 1;
+        padding: 8px;
+        border-radius: 8px;
+        border: none;
+        background: transparent;
+        font-family: "DM Sans", sans-serif;
+        font-size: 13px;
+        font-weight: 400;
+        color: #777;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .tab.active {
+        background: #fff;
+        color: #1a1a1a;
+        font-weight: 600;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      }
+
+      .panel {
+        display: none;
+      }
+      .panel.active {
+        display: block;
+      }
+
+      .footer {
+        text-align: center;
+        font-size: 11px;
+        color: #c0bdb8;
+        margin-top: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="header">
+        <p class="header-eyebrow">Date Calculator</p>
+        <h1 class="header-title">Hitung Tanggal</h1>
+      </div>
+
+      <div class="card">
+        <div class="section">
+          <!-- Tab switcher -->
+          <div class="tabs">
+            <button class="tab active" data-tab="add">
+              Tambah / Kurang Hari
+            </button>
+            <button class="tab" data-tab="diff">Selisih Dua Tanggal</button>
+          </div>
+
+          <!-- PANEL 1: Add/subtract days -->
+          <div class="panel active" id="panel-add">
+            <p class="section-label">Tanggal Awal</p>
+            <div class="row">
+              <div class="group">
+                <label>Dari Tanggal</label>
+                <input type="date" id="startDate" />
+              </div>
+            </div>
+
+            <div class="row" style="margin-top: 18px">
+              <div class="group">
+                <label>Jumlah Hari</label>
+                <input
+                  type="number"
+                  id="daysInput"
+                  value="30"
+                  min="0"
+                  max="9999"
+                  placeholder="30"
+                />
+              </div>
+            </div>
+
+            <div style="margin-top: 12px; margin-bottom: 18px">
+              <span class="quick-label">Cepat pilih</span>
+              <div class="quick-btns">
+                <button class="quick-btn active" data-days="30">30 hari</button>
+                <button class="quick-btn" data-days="60">60 hari</button>
+                <button class="quick-btn" data-days="90">90 hari</button>
+                <button class="quick-btn" data-days="100">100 hari</button>
+                <button class="quick-btn" data-days="180">180 hari</button>
+                <button class="quick-btn" data-days="365">1 tahun</button>
+              </div>
+            </div>
+
+            <div>
+              <span class="quick-label">Arah</span>
+              <div class="dir-wrap">
+                <button class="dir-btn active" data-dir="1">+ ke Depan</button>
+                <button class="dir-btn" data-dir="-1">− ke Belakang</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- PANEL 2: Diff between two dates -->
+          <div class="panel" id="panel-diff">
+            <p class="section-label">Dua Tanggal</p>
+            <div class="row">
+              <div class="group">
+                <label>Tanggal Awal</label>
+                <input type="date" id="diffStart" />
+              </div>
+              <div class="group">
+                <label>Tanggal Akhir</label>
+                <input type="date" id="diffEnd" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div style="height: 1px; background: #f0eee9; margin: 0 24px"></div>
+
+        <!-- Result -->
+        <div class="section" id="resultSection">
+          <!-- filled by JS -->
+        </div>
+      </div>
+
+      <p class="footer">Semua kalkulasi otomatis — cukup ubah input di atas</p>
+    </div>
+
+    <script>
+      // ── helpers ────────────────────────────────────────────────────────────────
+      const DAYS_ID = [
+        "Minggu",
+        "Senin",
+        "Selasa",
+        "Rabu",
+        "Kamis",
+        "Jumat",
+        "Sabtu",
+      ];
+      const MONTHS_ID = [
+        "Januari",
+        "Februari",
+        "Maret",
+        "April",
+        "Mei",
+        "Juni",
+        "Juli",
+        "Agustus",
+        "September",
+        "Oktober",
+        "November",
+        "Desember",
+      ];
+
+      function pad(n) {
+        return String(n).padStart(2, "0");
+      }
+      function toISO(d) {
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+      }
+      function todayISO() {
+        return toISO(new Date());
+      }
+
+      function parseLocal(iso) {
+        if (!iso) return null;
+        const [y, m, d] = iso.split("-").map(Number);
+        return new Date(y, m - 1, d);
+      }
+
+      function formatLong(d) {
+        return `${DAYS_ID[d.getDay()]}, ${d.getDate()} ${MONTHS_ID[d.getMonth()]} ${d.getFullYear()}`;
+      }
+      function formatShort(d) {
+        return `${pad(d.getDate())} ${MONTHS_ID[d.getMonth()].slice(0, 3)} ${d.getFullYear()}`;
+      }
+
+      function breakdownDiff(totalDays) {
+        const abs = Math.abs(totalDays);
+        const y = Math.floor(abs / 365);
+        const rem = abs % 365;
+        const m = Math.floor(rem / 30);
+        const d = rem % 30;
+        const w = Math.floor(abs / 7);
+        return { y, m, d, w, abs };
+      }
+
+      // ── state ──────────────────────────────────────────────────────────────────
+      let activeTab = "add";
+      let direction = 1;
+
+      // ── init defaults ──────────────────────────────────────────────────────────
+      document.getElementById("startDate").value = todayISO();
+      document.getElementById("diffStart").value = todayISO();
+      // diffEnd: today + 30 days
+      const plus30 = new Date();
+      plus30.setDate(plus30.getDate() + 30);
+      document.getElementById("diffEnd").value = toISO(plus30);
+
+      // ── tab switch ─────────────────────────────────────────────────────────────
+      document.querySelectorAll(".tab").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          activeTab = btn.dataset.tab;
+          document
+            .querySelectorAll(".tab")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          document
+            .querySelectorAll(".panel")
+            .forEach((p) => p.classList.remove("active"));
+          document.getElementById("panel-" + activeTab).classList.add("active");
+          render();
+        });
+      });
+
+      // ── quick day buttons ──────────────────────────────────────────────────────
+      document.querySelectorAll(".quick-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".quick-btn")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          document.getElementById("daysInput").value = btn.dataset.days;
+          render();
+        });
+      });
+
+      // ── direction buttons ──────────────────────────────────────────────────────
+      document.querySelectorAll(".dir-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".dir-btn")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          direction = parseInt(btn.dataset.dir);
+          render();
+        });
+      });
+
+      // ── input listeners ────────────────────────────────────────────────────────
+      ["startDate", "daysInput", "diffStart", "diffEnd"].forEach((id) => {
+        document.getElementById(id).addEventListener("input", () => {
+          if (id === "daysInput") {
+            document.querySelectorAll(".quick-btn").forEach((b) => {
+              b.classList.toggle(
+                "active",
+                b.dataset.days === document.getElementById("daysInput").value,
+              );
+            });
+          }
+          render();
+        });
+      });
+
+      // ── render ─────────────────────────────────────────────────────────────────
+      function render() {
+        const out = document.getElementById("resultSection");
+
+        if (activeTab === "add") {
+          renderAdd(out);
+        } else {
+          renderDiff(out);
+        }
+      }
+
+      function renderAdd(out) {
+        const startISO = document.getElementById("startDate").value;
+        const days = parseInt(document.getElementById("daysInput").value) || 0;
+        const start = parseLocal(startISO);
+
+        if (!start) {
+          out.innerHTML = `<p style="color:#AAA;font-size:13px;">Pilih tanggal awal.</p>`;
+          return;
+        }
+
+        const result = new Date(start);
+        result.setDate(result.getDate() + days * direction);
+
+        const bd = breakdownDiff(days);
+        const dirLabel = direction === 1 ? "setelah" : "sebelum";
+        const dirSign = direction === 1 ? "+" : "−";
+
+        out.innerHTML = `
+      <p class="section-label">Hasil</p>
+      <p class="result-big">${formatShort(start)} ${dirSign} ${days} hari</p>
+      <p class="result-day">${dirLabel} ${formatLong(start)}</p>
+      <p class="result-date-display">${pad(result.getDate())} ${MONTHS_ID[result.getMonth()].slice(0, 3).toUpperCase()} ${result.getFullYear()}</p>
+      <p class="result-full">${formatLong(result)}</p>
+      <div class="breakdown">
+        ${bd.y > 0 ? `<div class="chip"><strong>${bd.y}</strong>tahun</div>` : ""}
+        ${bd.m > 0 ? `<div class="chip"><strong>${bd.m}</strong>bulan</div>` : ""}
+        ${bd.d > 0 ? `<div class="chip"><strong>${bd.d}</strong>hari sisa</div>` : ""}
+        <div class="chip"><strong>${bd.w}</strong>minggu</div>
+        <div class="chip"><strong>${bd.abs}</strong>hari total</div>
+      </div>`;
+      }
+
+      function renderDiff(out) {
+        const s = parseLocal(document.getElementById("diffStart").value);
+        const e = parseLocal(document.getElementById("diffEnd").value);
+
+        if (!s || !e) {
+          out.innerHTML = `<p style="color:#AAA;font-size:13px;">Pilih kedua tanggal.</p>`;
+          return;
+        }
+
+        const msPerDay = 86400000;
+        const totalDays = Math.round((e - s) / msPerDay);
+        const bd = breakdownDiff(totalDays);
+        const sign = totalDays >= 0 ? "" : "−";
+        const label = totalDays >= 0 ? "setelah" : "sebelum";
+
+        out.innerHTML = `
+      <p class="section-label">Selisih</p>
+      <p class="diff-result">${sign}${bd.abs}<span>hari</span></p>
+      <p class="diff-breakdown">
+        ${formatLong(s)} → ${formatLong(e)}
+      </p>
+      <div class="breakdown">
+        ${bd.y > 0 ? `<div class="chip"><strong>${bd.y}</strong>tahun</div>` : ""}
+        ${bd.m > 0 ? `<div class="chip"><strong>${bd.m}</strong>bulan</div>` : ""}
+        ${bd.d > 0 ? `<div class="chip"><strong>${bd.d}</strong>hari</div>` : ""}
+        <div class="chip"><strong>${bd.w}</strong>minggu</div>
+        <div class="chip"><strong>${bd.abs}</strong>hari total</div>
+      </div>`;
+      }
+
+      render();
+    </script>
+  </body>
+</html>
